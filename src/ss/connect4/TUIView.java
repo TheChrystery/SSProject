@@ -47,9 +47,9 @@ public class TUIView implements Observer {
 		
 	}
 	
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		Board b = new Board();
 		TUIView v = new TUIView(b);
 		System.out.print(v);
-	}*/
+	}
 }
