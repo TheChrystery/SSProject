@@ -12,12 +12,12 @@ public class Board extends Observable {
 	public static final int DIM = 4;
 	/**
 	 * the array that stores the mark of each field of the board.
-     */
+	 */
 	private Mark[] fields;
-
-    /**
-     * Creates a board, fills fields with the empty mark.
-     */
+	
+	/**
+	 * Creates a board, fills fields with the empty mark.
+	 */
 	public Board() {
 		fields = new Mark[DIM * DIM * DIM];
 		for (int i = 0; 0 <= i && i < DIM * DIM * DIM; i++) {
@@ -25,10 +25,11 @@ public class Board extends Observable {
 		}
 	}
 
-    /**
-     * Creates a copy of the board, useful for writing an AI.
-     * @return a copy of the Board
-     */
+	/**
+	 * Creates a copy of the board, useful for writing an AI.
+	 * 
+	 * @return a copy of the Board
+	 */
 	public Board deepCopy() {
 		Board b = new Board();
 		for (int i = 0; i < DIM * DIM * DIM; i++) {
@@ -37,24 +38,49 @@ public class Board extends Observable {
 		return b;
 	}
 
-    /**
-     * returns the index corresponding to the (x,y,z) coordinates.
-     * @param int x 
-     * @param int y 
-     * @param int z 
-     * @return index, 0 <= index < DIM^3
-     */
-	public int index(int x, int y, int z) {
+	/**
+	 * returns the index corresponding to the (x,y,z) coordinates.
+	 * 
+	 * @param int
+	 *            x
+	 * @param int
+	 *            y
+	 * @param int
+	 *            z
+	 * @return index, 0 <= index < DIM^3
+	 */
+	public int getIndex(int x, int y, int z) {
 		return x + (DIM * y) + (DIM * DIM * z);
 	}
 
 	/**
+	 * returns an integer array [x,y,z] corresponding to the parameter index
+	 * 
+	 * @param int
+	 *            index
+	 * @return int[3]
+	 */
+	public int[] coordinates(int index) {
+		if (isField(index)) {
+			int[] xyz = new int[3];
+			xyz[0] = (index % 16) % 4;
+			xyz[1] = (index % 16) / 4;
+			xyz[2] = index / 16;
+			return xyz;
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Checks whether an index is valid for this board.
-	 * @param int index
+	 * 
+	 * @param int
+	 *            index
 	 * @return true if 0 <= index < DIM^3
 	 */
 	public boolean isField(int index) {
-		if (0 <= index && index <= (DIM * DIM * DIM) - 1) {
+		if (0 <= index && index < (DIM * DIM * DIM)) {
 			return true;
 		} else {
 			return false;
@@ -62,8 +88,53 @@ public class Board extends Observable {
 	}
 
 	/**
+	 * Checks whether a field can be played; the field itself is empty and the
+	 * fields directly under it are not.
+	 * 
+	 * @param int
+	 *            index
+	 * @return true if the field is playable
+	 */
+	public boolean isPlayableField(int index) {
+		if (isField(index) && isEmptyField(index)) {
+			int x = coordinates(index)[0];
+			int y = coordinates(index)[1];
+			int z = coordinates(index)[2];
+			for (int i = 0; i < z; i++) {
+				if (isEmptyField(getIndex(x, y, i))) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether a move with this x and y can be made.
+	 * 
+	 * @param int
+	 *            x
+	 * @param int
+	 *            y
+	 * @return true if there is such a move.
+	 */
+	public int moveIndex(int x, int y) {
+		if (x >= 0 && x < DIM && y >= 0 && y < DIM) {
+			for (int z = 0; z < DIM; z++) {
+				if (isEmptyField(getIndex(x, y, z))) {
+					return getIndex(x, y, z);
+				}
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * returns the Mark occupying field i, if it is a valid field.
-	 * @param int index
+	 * 
+	 * @param int
+	 *            index
 	 * @return Mark or null
 	 */
 	public Mark getField(int i) {
@@ -76,20 +147,25 @@ public class Board extends Observable {
 
 	/**
 	 * overwrites the Mark in fields[i] with m, if it exists.
-	 * @param int index
-	 * @param Mark m
+	 * 
+	 * @param int
+	 *            index
+	 * @param Mark
+	 *            m
 	 */
-	public void setField(int i, Mark m) {
-		if (this.isField(i)) {
-			fields[i] = m;
-		    setChanged();
-		    notifyObservers("Board changed");
+	public void setField(int index, Mark m) {
+		if (isField(index)) {
+			fields[index] = m;
+			setChanged();
+			notifyObservers("Board changed");
 		}
 	}
 
 	/**
 	 * Checks whether a field is valid and empty.
-	 * @param int index
+	 * 
+	 * @param int
+	 *            index
 	 * @return true if fields[i] is empty.
 	 */
 	public boolean isEmptyField(int i) {
@@ -98,6 +174,7 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether the board is full.
+	 * 
 	 * @return true if the board is full.
 	 */
 	public boolean isFull() {
@@ -111,7 +188,9 @@ public class Board extends Observable {
 
 	/**
 	 * checks whether there is an x-row of Mark m.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if there is an x-row
 	 */
 	public boolean hasXRow(Mark m) {
@@ -119,7 +198,7 @@ public class Board extends Observable {
 			for (int y = 0; y < DIM; y++) {
 				int counter = 0;
 				for (int x = 0; x < DIM; x++) {
-					if (getField(index(x, y, z)) == m) {
+					if (getField(getIndex(x, y, z)) == m) {
 						counter++;
 					}
 				}
@@ -133,7 +212,9 @@ public class Board extends Observable {
 
 	/**
 	 * checks whether there is an y-row of Mark m.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if there is an y-row
 	 */
 	public boolean hasYRow(Mark m) {
@@ -141,7 +222,7 @@ public class Board extends Observable {
 			for (int x = 0; x < DIM; x++) {
 				int counter = 0;
 				for (int y = 0; y < DIM; y++) {
-					if (getField(index(x, y, z)) == m) {
+					if (getField(getIndex(x, y, z)) == m) {
 						counter++;
 					}
 				}
@@ -155,7 +236,9 @@ public class Board extends Observable {
 
 	/**
 	 * checks whether there is an z-row of Mark m.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if there is an z-row
 	 */
 	public boolean hasZRow(Mark m) {
@@ -163,7 +246,7 @@ public class Board extends Observable {
 			for (int y = 0; y < DIM; y++) {
 				int counter = 0;
 				for (int z = 0; z < DIM; z++) {
-					if (getField(index(x, y, z)) == m) {
+					if (getField(getIndex(x, y, z)) == m) {
 						counter++;
 					}
 				}
@@ -177,7 +260,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether Mark m has any kind of row.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if Mark m has a row
 	 */
 	public boolean hasRow(Mark m) {
@@ -190,7 +275,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether Mark m has an X Diagonal.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if Mark m has an X Diagonal
 	 */
 	public boolean hasXDiagonal(Mark m) {
@@ -198,10 +285,10 @@ public class Board extends Observable {
 			int counter1 = 0;
 			int counter2 = 0;
 			for (int yz = 0; yz < DIM; yz++) {
-				if (getField(index(x, yz, yz)) == m) {
+				if (getField(getIndex(x, yz, yz)) == m) {
 					counter1++;
 				}
-				if (getField(index(x, yz, DIM - 1 - yz)) == m) {
+				if (getField(getIndex(x, yz, DIM - 1 - yz)) == m) {
 					counter2++;
 				}
 			}
@@ -214,7 +301,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether Mark m has an Y Diagonal.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if Mark m has an Y Diagonal
 	 */
 	public boolean hasYDiagonal(Mark m) {
@@ -222,10 +311,10 @@ public class Board extends Observable {
 			int counter1 = 0;
 			int counter2 = 0;
 			for (int xz = 0; xz < DIM; xz++) {
-				if (getField(index(xz, y, xz)) == m) {
+				if (getField(getIndex(xz, y, xz)) == m) {
 					counter1++;
 				}
-				if (getField(index(xz, y, DIM - 1 - xz)) == m) {
+				if (getField(getIndex(xz, y, DIM - 1 - xz)) == m) {
 					counter2++;
 				}
 			}
@@ -238,7 +327,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether Mark m has an Z Diagonal.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if Mark m has an Z Diagonal
 	 */
 	public boolean hasZDiagonal(Mark m) {
@@ -246,10 +337,10 @@ public class Board extends Observable {
 			int counter1 = 0;
 			int counter2 = 0;
 			for (int xy = 0; xy < DIM; xy++) {
-				if (getField(index(xy, xy, z)) == m) {
+				if (getField(getIndex(xy, xy, z)) == m) {
 					counter1++;
 				}
-				if (getField(index(xy, DIM - 1 - xy, z)) == m) {
+				if (getField(getIndex(xy, DIM - 1 - xy, z)) == m) {
 					counter2++;
 				}
 			}
@@ -262,7 +353,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether Mark m has a True Diagonal; a diagonal to every plane.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if Mark m has such a diagonal
 	 */
 	public boolean hasTrueDiagonal(Mark m) {
@@ -271,16 +364,16 @@ public class Board extends Observable {
 		int counter3 = 0;
 		int counter4 = 0;
 		for (int i = 0; i < DIM; i++) {
-			if (getField(index(i, i, i)) == m) {
+			if (getField(getIndex(i, i, i)) == m) {
 				counter1++;
 			}
-			if (getField(index(DIM - 1 - i, i, i)) == m) {
+			if (getField(getIndex(DIM - 1 - i, i, i)) == m) {
 				counter2++;
 			}
-			if (getField(index(i, DIM - 1 - i, i)) == m) {
+			if (getField(getIndex(i, DIM - 1 - i, i)) == m) {
 				counter3++;
 			}
-			if (getField(index(i, i, DIM - 1 - i)) == m) {
+			if (getField(getIndex(i, i, DIM - 1 - i)) == m) {
 				counter4++;
 			}
 		}
@@ -293,7 +386,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether Mark m has any diagonal.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if Mark m has any diagonal
 	 */
 	public boolean hasDiagonal(Mark m) {
@@ -306,7 +401,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether Mark m has won.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if Mark m has won
 	 */
 	public boolean isWinner(Mark m) {
@@ -315,7 +412,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether this game has a winner.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if there is a winner
 	 */
 	public boolean hasWinner() {
@@ -324,7 +423,9 @@ public class Board extends Observable {
 
 	/**
 	 * Checks whether this game is over.
-	 * @param Mark m
+	 * 
+	 * @param Mark
+	 *            m
 	 * @return true if there is a winner or the board is full
 	 */
 	public boolean gameOver() {
@@ -334,7 +435,7 @@ public class Board extends Observable {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * fills fields[] with the empty Mark.
 	 */
