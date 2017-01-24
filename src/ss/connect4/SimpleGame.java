@@ -136,8 +136,7 @@ public class SimpleGame {
      * Prints the game situation.
      */
     private void update() {
-        System.out.println("\ncurrent game situation: \n\n" + this.view.toString()
-                + "\n");
+        System.out.println(this.view.toString() + "\n");
     }
 
     /*@
