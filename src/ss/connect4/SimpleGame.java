@@ -59,7 +59,8 @@ public class SimpleGame {
      *            the second player
      */
     public SimpleGame(Player s0, Player s1) {
-        board = new Board(); 
+        board = new Board();
+        view = new TUIView(board);
         players = new Player[NUMBER_PLAYERS];
         players[0] = s0;
         players[1] = s1;
@@ -123,20 +124,13 @@ public class SimpleGame {
      * the changed game situation is printed.
      */
     private void play() {
-    	update();
+    	System.out.println(this.view.toString() + "\n");
     	int i = 0;
         while (!board.isFull() && !board.hasWinner()) {
         	players[i % 2].makeMove(board);
         	i++;
         }
         printResult();
-    }
-
-    /**
-     * Prints the game situation.
-     */
-    private void update() {
-        System.out.println(this.view.toString() + "\n");
     }
 
     /*@
@@ -152,14 +146,13 @@ public class SimpleGame {
                     : players[1];
             System.out.println("Speler " + winner.getName() + " ("
                     + winner.getMark().toString() + ") has won!");
-        } else {
+        } else if (board.isFull()) {
             System.out.println("Draw. There is no winner!");
         }
     }
     
     public static void main(String[] args) {
     	SimpleGame test = new SimpleGame(new HumanPlayer("Klaas", Mark.X), new HumanPlayer("Piet", Mark.O));
-    	test.view = new TUIView(test.board);
     	test.start();
     	
     }

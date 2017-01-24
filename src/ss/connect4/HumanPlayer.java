@@ -12,10 +12,6 @@ public class HumanPlayer extends Player {
 
 	// -- Constructors -----------------------------------------------
 
-	/*
-	 * @ requires name != null; requires mark == Mark.XX || mark == Mark.OO;
-	 * ensures this.getName() == name; ensures this.getMark() == mark;
-	 */
 	/**
 	 * Creates a new human player object.
 	 * 
@@ -26,11 +22,7 @@ public class HumanPlayer extends Player {
 
 	// -- Commands ---------------------------------------------------
 
-	/*
-	 * @ requires board != null; ensures board.isField(\result) &&
-	 * board.isEmptyField(\result);
-	 * 
-	 */
+
 	/**
 	 * Asks the user to input the field where to place the next mark. This is
 	 * done using the standard input/output. \
@@ -40,21 +32,48 @@ public class HumanPlayer extends Player {
 	 * @return the player's chosen field
 	 */
 	public int determineMove(Board board) {
-		String prompt = "> " + getName() + " (" + getMark().toString() + ")" + ", what is your choice? ";
-		int x = readInt(prompt);
-		int y = readInt(prompt);
-		int index = board.moveIndex(x, y);
+		int[] xy = readInts("Player " + getName() + ":" + getMark().toString() + " what is your x y ?");
+		int index = board.moveIndex(xy[0], xy[1]);
 		boolean valid = board.isPlayableField(index);
 		while (!valid) {
-			System.out.println("ERROR: field " + index + " is no valid choice.");
-			x = readInt(prompt);
-			y = readInt(prompt);
-			index = board.moveIndex(x, y);
+			System.out.println("ERROR: " + xy[0] + ", " + xy[1] + " is not a valid choice.");
+			xy = readInts("Player " + getName() + ":" + getMark().toString() + " what is your x y ?");
+			index = board.moveIndex(xy[0], xy[1]);
 			valid = board.isPlayableField(index);
 		}
 		return index;
 	}
 
+	/**
+	 * Writes a prompt to standard out and tries to read two int values from
+	 * standard in. This is repeated until tow int values are entered.
+	 * 
+	 * @param prompt
+	 *            the question to prompt the user
+	 * @return an array of the int values entered by the user
+	 */
+	private int[] readInts(String prompt) {
+		int[] values = new int[2];
+		boolean intRead1 = false;
+		boolean intRead2 = false;
+		Scanner line = new Scanner(System.in);
+		System.out.print(prompt);
+		Scanner scannerLine = new Scanner(line.nextLine());
+		while (!intRead1) {
+			if (scannerLine.hasNextInt()) {
+				intRead1 = true;
+				values[0] = scannerLine.nextInt();
+				}
+			}
+		while (!intRead2) {
+			if (scannerLine.hasNextInt()) {
+				intRead2 = true;
+				values[1] = scannerLine.nextInt();
+				}
+			}
+		return values;
+	}
+	
 	/**
 	 * Writes a prompt to standard out and tries to read an int value from
 	 * standard in. This is repeated until an int value is entered.
@@ -79,5 +98,4 @@ public class HumanPlayer extends Player {
 		} while (!intRead);
 		return value;
 	}
-
 }

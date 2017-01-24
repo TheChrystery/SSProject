@@ -146,7 +146,23 @@ public class Board extends Observable {
 	}
 
 	/**
-	 * overwrites the Mark in fields[i] with m, if it exists.
+	 * overwrites the Mark in fields[i] with m, if it exists, notifies view.
+	 * 
+	 * @param int
+	 *            index
+	 * @param Mark
+	 *            m
+	 */
+	public void playField(int index, Mark m) {
+		if (isField(index)) {
+			fields[index] = m;
+			setChanged();
+			notifyObservers("Board changed");
+		}
+	}
+	
+	/**
+	 * overwrites the Mark in fields[i] with m, if it exists, doesn't notify view.
 	 * 
 	 * @param int
 	 *            index
@@ -156,8 +172,6 @@ public class Board extends Observable {
 	public void setField(int index, Mark m) {
 		if (isField(index)) {
 			fields[index] = m;
-			setChanged();
-			notifyObservers("Board changed");
 		}
 	}
 
@@ -179,7 +193,7 @@ public class Board extends Observable {
 	 */
 	public boolean isFull() {
 		for (int i = 0; i < DIM * DIM * DIM; i++) {
-			if (!isEmptyField(i)) {
+			if (isEmptyField(i)) {
 				return false;
 			}
 		}
@@ -444,5 +458,4 @@ public class Board extends Observable {
 			this.setField(i, Mark.E);
 		}
 	}
-
 }
