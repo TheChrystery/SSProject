@@ -31,7 +31,7 @@ public class ComputerPlayerAdv extends Player {
 	
 		
 		currentBoard = board.deepCopy();
-		possibleMoves = new ArrayList<>();
+		ArrayList<Integer> possibleMoves = new ArrayList<Integer>();
 			for(int i=0; i < DIM*DIM*DIM; i++) {
 				if(currentBoard.isPlayableField(i)) {
 					possibleMoves.add(i);
@@ -58,7 +58,7 @@ public class ComputerPlayerAdv extends Player {
 			// look for 1 or 2 on the same row, diagonal or column
 			
 		if(!found) {
-		smartField = (int)(Math.random() * possibleMoves.size() + 1);
+		smartField = possibleMoves.get((int)(Math.random() * possibleMoves.size()));
 		
 	    }
 	    return smartField;

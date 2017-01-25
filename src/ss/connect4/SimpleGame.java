@@ -70,16 +70,16 @@ public class SimpleGame {
     // -- Commands ---------------------------------------------------
 
     /**
-     * Starts the Tic Tac Toe game. <br>
+     * Starts the connect4 game. <br>
      * Asks after each ended game if the user want to continue. Continues until
      * the user does not want to play anymore.
      */
     public void start() {
-        boolean doorgaan = true;
-        while (doorgaan) {
+        boolean continues = true;
+        while (continues) {
             reset();
             play();
-            doorgaan = readBoolean("\n> Play another time? (y/n)?", "y", "n");
+            continues = readBoolean("\n> Play another time? (y/n)?", "y", "n");
         }
     }
 
@@ -118,7 +118,7 @@ public class SimpleGame {
     }
 
     /**
-     * Plays the Tic Tac Toe game. <br>
+     * Plays the connect4 game. <br>
      * First the (still empty) board is shown. Then the game is played until it
      * is over. Players can make a move one after the other. After each move,
      * the changed game situation is printed.
@@ -132,10 +132,6 @@ public class SimpleGame {
         }
         printResult();
     }
-
-    /*@
-       requires this.board.gameOver();
-     */
 
     /**
      * Prints the result of the last game. <br>
@@ -152,7 +148,7 @@ public class SimpleGame {
     }
     
     public static void main(String[] args) {
-    	SimpleGame test = new SimpleGame(new HumanPlayer("Klaas", Mark.X), new HumanPlayer("Piet", Mark.O));
+    	SimpleGame test = new SimpleGame(new ComputerPlayerAdv("Klaas", Mark.X), new ComputerPlayer("Piet", Mark.O));
     	test.start();
     	
     }

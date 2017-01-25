@@ -16,7 +16,6 @@ public class ComputerPlayer extends Player {
 	public ComputerPlayer(String name, Mark mark) {
 		// create a computer player with the given mark and strategy;
 		super(name, mark);
-
 	}
 
 	@Override
@@ -26,13 +25,15 @@ public class ComputerPlayer extends Player {
 	public int determineMove(Board board) {
 		
 		currentBoard = board.deepCopy();
-		possibleMoves = new ArrayList<>();
-			for(int i=0; i < DIM*DIM*DIM; i++) {
-				if(currentBoard.isPlayableField(i)) {
-					possibleMoves.add(i);
-				}	
-			}
-	    return (int) (Math.random() * possibleMoves.size() + 1);
+		ArrayList<Integer> possibleMoves = new ArrayList<Integer>();
+		for(int i=0; i < DIM*DIM*DIM; i++) {
+			if(currentBoard.isPlayableField(i)) {
+				possibleMoves.add(i);
+			}	
+		}
+		int index = (int) (Math.random() * possibleMoves.size());
+		int move = possibleMoves.get(index);
+	    return move; 
 
 	}
 }
