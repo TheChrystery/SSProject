@@ -36,13 +36,13 @@ public class TUIView implements Observer {
 				}
 			}
 			if (b.equals("")) {
-				b = row;
+				b = "\n" + row;
 			} else {
 				b = b + "\n" + RowSeparator + "\n" + row;
 			}
 		}
 		b = b + "\n" + Zline;
-		return b + "\n\n";
+		return b + "\n";
 	}
 
 	@Override

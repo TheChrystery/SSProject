@@ -37,7 +37,7 @@ public class HumanPlayer extends Player {
 		boolean valid = board.isPlayableField(index);
 		while (!valid) {
 			System.out.println("ERROR: " + xy[0] + ", " + xy[1] + " is not a valid choice.");
-			xy = readInts("Player " + getName() + ":" + getMark().toString() + " what is your x y ?");
+			xy = readInts("Player " + getName() + ":" + getMark().toString() + " what is your move x y ?");
 			index = board.moveIndex(xy[0], xy[1]);
 			valid = board.isPlayableField(index);
 		}
