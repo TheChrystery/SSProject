@@ -7,10 +7,10 @@ import java.util.Scanner;
 public class TUIView implements Observer {
 
 	private Board board;
-	private static final String[] NUMBERING = { " 0 | x1| x2| x3 ", "---+---+---+---", " y1| - | - | - ",
-			"---+---+---+---", " y2| - | - | - ", "---+---+---+---", " y3| - | - | - " };
-	private static final String LINE = NUMBERING[1];
-	private static final String DELIM = "     ";
+	private static final String RowSeparator = "     ---+---+---+---    ---+---+---+---    ---+---+---+---    ---+---+---+---"
+			+ "     -----+-----+-----+-----";
+	private static final String Separator = "      ";
+	private static final String Zline = "          z = 1              z = 2              z = 3              z = 4";
 
 	public TUIView(Board b) {
 		this.board = b;
@@ -19,27 +19,30 @@ public class TUIView implements Observer {
 
 	public String toString() {
 		String b = "";
-		for (int z = 0; z < board.DIM; z++) {
-			String s = "";
-			for (int x = 0; x < board.DIM; x++) {
-				String row = "";
-				for (int y = 0; y < board.DIM; y++) {
-					row = row + " " + board.getField(board.getIndex(x, y, z)).toString() + " ";
-					if (y < board.DIM - 1) {
-						row = row + "|";
+		for (int y = 0; y < board.DIM; y++) {
+			String row = "";
+			for (int z = 0; z < board.DIM; z++) {
+				int xcounter = 0;
+				for (int x = 0; x < board.DIM; x++) {
+					if (x == 0) {
+						row = row + Separator + board.getField(board.getIndex(x, y, z)).toString();
+						xcounter ++;
+					} else if (z == 3 && x == 3) {
+						row = row + " | " + board.getField(board.getIndex(x, y, z)).toString() 
+						+ Separator + "(0," + y + ")" + "|" + "(1," + y + ")" + "|" + "(2," + y + ")" + "|" + "(3," + y + ")";
+					} else {
+						row = row + " | " + board.getField(board.getIndex(x, y, z)).toString();
 					}
 				}
-				s = s + row + DELIM + NUMBERING[x * 2];
-				if (x < board.DIM - 1) {
-					s = s + "\n" + LINE + DELIM + NUMBERING[x * 2 + 1] + "\n";
-				}
-				if (x == board.DIM - 1) {
-					s = s + " z = " + z;
-				}
 			}
-			b = b + "\n\n" + s;
+			if (b.equals("")) {
+				b = row;
+			} else {
+				b = b + "\n" + RowSeparator + "\n" + row;
+			}
 		}
-		return b;
+		b = b + "\n" + Zline;
+		return b + "\n\n";
 	}
 
 	@Override
@@ -48,9 +51,9 @@ public class TUIView implements Observer {
 
 	}
 
-	public static void main(String[] args) {;
+	public static void main(String[] args) {
 		Board b = new Board();
 		TUIView v = new TUIView(b);
-		b.setField(0, Mark.X);
+		b.playField(0, Mark.X);
 	}
 }

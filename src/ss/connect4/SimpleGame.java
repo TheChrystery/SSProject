@@ -148,7 +148,7 @@ public class SimpleGame {
     }
     
     public static void main(String[] args) {
-    	SimpleGame test = new SimpleGame(new ComputerPlayerAdv("Klaas", Mark.X), new ComputerPlayer("Piet", Mark.O));
+    	SimpleGame test = new SimpleGame(new HumanPlayer("Klaas", Mark.X), new ComputerPlayer("Piet", Mark.O));
     	test.start();
     	
     }
