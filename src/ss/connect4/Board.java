@@ -207,7 +207,7 @@ public class Board extends Observable {
 	/**
 	 * Takes the index of a field and a mark, returns the number of directly neighboured fields with the same mark. This method is used for AI's.
 	 * @param int field, Mark m
-	 * @return
+	 * @return the number of direct neigbors of field with this mark
 	 */
 	public int neighbourFields(int field, Mark m) {
 		int counter = 0;
