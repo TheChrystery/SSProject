@@ -24,12 +24,12 @@ public class HumanPlayer extends Player {
 
 
 	/**
-	 * Asks the user to input the field where to place the next mark. This is
+	 * Asks the user to input two integers for x and y, 
 	 * done using the standard input/output. \
 	 * 
 	 * @param board
 	 *            the game board
-	 * @return the player's chosen field
+	 * @return the playable field corresponding to the input
 	 */
 	public int determineMove(Board board) {
 		int[] xy = readInts("Player " + getName() + ":" + getMark().toString() + " what is your x y ?");
@@ -46,7 +46,7 @@ public class HumanPlayer extends Player {
 
 	/**
 	 * Writes a prompt to standard out and tries to read two int values from
-	 * standard in. This is repeated until tow int values are entered.
+	 * standard in. This is repeated until two int values are entered.
 	 * 
 	 * @param prompt
 	 *            the question to prompt the user
@@ -58,8 +58,15 @@ public class HumanPlayer extends Player {
 		boolean intRead2 = false;
 		Scanner line = new Scanner(System.in);
 		System.out.print(prompt);
-		Scanner scannerLine = new Scanner(line.nextLine());
-		while (!intRead1) {
+		String s = line.nextLine();
+		Scanner scannerLine = new Scanner(s);
+		if (s.equals("help") || s.equals("HELP")) {
+			System.out.println("\nChoose an x and a y. Your mark will be played in the first legal (x,y,z), if one exists. Players take turns.\n"
+					+ "You win the game when you connect 4 of your marks in either a straight or diagonal line in any direction. \n"
+					+ "if the board is full, i.e. there are no legal moves left to play, the game ends in a draw.\n");
+			return new int[]{-1, -1};
+		} else {
+			while (!intRead1) {
 			if (scannerLine.hasNextInt()) {
 				intRead1 = true;
 				values[0] = scannerLine.nextInt();
@@ -72,30 +79,6 @@ public class HumanPlayer extends Player {
 				}
 			}
 		return values;
-	}
-	
-	/**
-	 * Writes a prompt to standard out and tries to read an int value from
-	 * standard in. This is repeated until an int value is entered.
-	 * 
-	 * @param prompt
-	 *            the question to prompt the user
-	 * @return the first int value which is entered by the user
-	 */
-	private int readInt(String prompt) {
-		int value = 0;
-		boolean intRead = false;
-		@SuppressWarnings("resource")
-		Scanner line = new Scanner(System.in);
-		do {
-			System.out.print(prompt);
-			try (Scanner scannerLine = new Scanner(line.nextLine());) {
-				if (scannerLine.hasNextInt()) {
-					intRead = true;
-					value = scannerLine.nextInt();
-				}
-			}
-		} while (!intRead);
-		return value;
+		}
 	}
 }

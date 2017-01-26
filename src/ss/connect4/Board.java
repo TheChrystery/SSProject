@@ -185,6 +185,39 @@ public class Board extends Observable {
 	public boolean isEmptyField(int i) {
 		return isField(i) && getField(i) == Mark.E;
 	}
+	
+	/**
+	 * Takes two indices of fields, returns whether they are direct neighbours, straight or diagonal.
+	 * @param int index1, int index2
+	 * @return true if neighbours
+	 */
+	public boolean areNeighbours(int index1, int index2) {
+		int[] xyz1 = coordinates(index1);
+		int[] xyz2 = coordinates(index2);
+		if (!xyz1.equals(xyz2) &&
+			xyz1[0] - 1 <= xyz2[0] && xyz2[0] <= xyz1[0] + 1 &&
+		    xyz1[1] - 1 <= xyz2[1] && xyz2[1] <= xyz1[1] + 1 &&
+		    xyz1[2] - 1 <= xyz2[2] && xyz2[2] <= xyz1[2] + 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Takes the index of a field and a mark, returns the number of directly neighboured fields with the same mark. This method is used for AI's.
+	 * @param int field, Mark m
+	 * @return
+	 */
+	public int neighbourFields(int field, Mark m) {
+		int counter = 0;
+		for (int i = 0; i < DIM * DIM * DIM; i++) {
+			if (areNeighbours(field, i) && fields[i].equals(m)) {
+				counter++;
+			}
+		}
+		return counter;
+	}
 
 	/**
 	 * Checks whether the board is full.
