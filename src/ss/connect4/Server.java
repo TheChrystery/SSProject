@@ -47,7 +47,7 @@ public class Server {
         // create Peer object and start the two-way communication
         try {
         	Socket socket = sock.accept();
-            Peer client = new Peer(name, socket);
+            Connection client = new Connection(socket);
             Thread streamInputHandler = new Thread(client);
             streamInputHandler.start();
             client.handleTerminalInput();
