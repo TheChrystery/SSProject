@@ -14,13 +14,15 @@ import java.util.Scanner;
  * @author Theo Ruys
  * @version 2005.02.21
  */
-public class Peer implements Runnable {
+public class Connection implements Runnable {
 	public static final String EXIT = "exit";
 
 	protected String name;
 	protected Socket sock;
 	protected BufferedReader in;
 	protected BufferedWriter out;
+	public enum STATUS {EMPTY, READY, PLAYING};
+	public STATUS connectionStatus = STATUS.EMPTY;
 
 	/*
 	 * @ requires (nameArg != null) && (sockArg != null);
@@ -33,8 +35,7 @@ public class Peer implements Runnable {
 	 * @param sockArg
 	 *            Socket of the Peer-proces
 	 */
-	public Peer(String nameArg, Socket sockArg) throws IOException {
-		name = nameArg;
+	public Connection(Socket sockArg) throws IOException {
 		sock = sockArg;
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
