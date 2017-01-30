@@ -15,10 +15,10 @@ public class ServerGame implements Runnable{
 		players[1] = conn2;
 		//Sets the current players' status to Playing, connects them to this game and removes them from readyClients;
 		conn1.connectionStatus = ServerConnection.STATUS.PLAYING;
-		conn1.server.readyClients.remove(conn1);
+		conn1.server.removeReadyClient(conn1);
 		conn1.game = this;
 		conn2.connectionStatus = ServerConnection.STATUS.PLAYING;
-		conn2.server.readyClients.remove(conn2);
+		conn2.server.removeReadyClient(conn2);
 		conn2.game = this;
 		this.run();
 	}
@@ -63,7 +63,7 @@ public class ServerGame implements Runnable{
 		//future implementation.
 	}
 	
-	public void makeMove(ServerConnection player, int x, int y) {
+	public synchronized void makeMove(ServerConnection player, int x, int y) {
 		if (isTurn(player) && board.isPlayableField(board.moveIndex(x, y))) {
 			board.setField(board.moveIndex(x,y), getMark(player));
 			current++;

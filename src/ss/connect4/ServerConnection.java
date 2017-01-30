@@ -49,7 +49,7 @@ public class ServerConnection implements Runnable {
 	public ServerConnection(Server param) throws IOException {
 		this.server = param;
 		this.sock = param.sock.accept();
-		this.server.clients.add(this);
+		this.server.addClient(this);
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 	}
@@ -70,21 +70,22 @@ public class ServerConnection implements Runnable {
 					int fourth = -1;
 					boolean secondRead = false;
 					// legal commands for all stati
-					if (first.equals("DISCONNECT")) {
+					if (first.equals("STATUS")) {
+						sendMessage("" + this.connectionStatus);
+					} else if (first.equals("DISCONNECT")) {
 						this.shutDown();
-					}
-					if (first.equals("PLAYERS")) {
+					} else if (first.equals("PLAYERS")) {
 						if (input.hasNext()) {
 							second = input.next();
 							secondRead = true;
 							sendMessage(getExtensions(second));
 						}
-					}
+					} else
 					// legal commands for a player with status EMPTY
 					if (this.connectionStatus.equals(STATUS.EMPTY)) {
 						this.name = first;
 						this.connectionStatus = STATUS.NAMED;
-						String extensions = "";
+						extensions = "";
 						if (!secondRead && input.hasNext()) {
 							second = input.next();
 							secondRead = true;
@@ -108,23 +109,29 @@ public class ServerConnection implements Runnable {
 					// legal commands for players with !STATUS.PLAYING beginning
 					// with GAME
 					if (first.equals("GAME")) {
-						if (this.connectionStatus.equals(STATUS.NAMED) && first.equals("READY")) {
-							this.connectionStatus = STATUS.READY;
-							this.server.readyClients.add(this);
-						}
-						if (this.connectionStatus.equals(STATUS.READY) && first.equals("UNREADY")) {
-							this.connectionStatus = STATUS.NAMED;
-							this.server.readyClients.remove(this);
-						}
-					}
-					if (this.connectionStatus.equals(STATUS.READY)) {
-						for (ServerConnection opponent : server.readyClients) {
-							if (!opponent.equals(this) && connectionStatus.equals(STATUS.READY)) {
-								new ServerGame(this, opponent);
+						if (!secondRead) {
+							second = input.next();
+							if (this.connectionStatus.equals(STATUS.NAMED) && second.equals("READY")) {
+
+								this.connectionStatus = STATUS.READY;
+								this.server.addReadyClient(this);
+								// look for opponents. If this method doesn't
+								// start a game, it waits for an opponent to
+								// start one with this player.
+								for (ServerConnection opponent : server.getReadyClients()) {
+									if (!opponent.equals(this)) {
+										new ServerGame(this, opponent);
+										break;
+									}
+								}
+							}
+							if (this.connectionStatus.equals(STATUS.READY) && second.equals("UNREADY")) {
+								this.connectionStatus = STATUS.NAMED;
+								this.server.removeReadyClient(this);
 							}
 						}
 					}
-					//PLAYING clients making moves.
+					// PLAYING client makes move.
 					if (this.connectionStatus.equals(STATUS.PLAYING)) {
 						if (first.equals("GAME")) {
 							if (secondRead) {
@@ -199,12 +206,12 @@ public class ServerConnection implements Runnable {
 		}
 
 		if (filter.equals("ALL")) {
-			for (int i = 0; i < server.clients.size(); i++) {
-				players = players + " " + server.clients.get(i).getName();
+			for (int i = 0; i < server.getClients().size(); i++) {
+				players = players + " " + server.getClients().get(i).getName();
 			}
 			return players;
 		} else {
-			for (ServerConnection conn : this.server.clients) {
+			for (ServerConnection conn : this.server.getClients()) {
 				int counter = 0;
 				Set<Integer> connExts = new HashSet<Integer>();
 				for (int j = 0; j < conn.extensions.length(); j++) {
@@ -246,8 +253,7 @@ public class ServerConnection implements Runnable {
 	 * Prints the String given as a parameter on system.out, Reads a string from
 	 * system.in and returns it
 	 * 
-	 * @param String
-	 *            tekst
+	 * @param String tekst
 	 * @return String antw
 	 */
 	static public String readString(String tekst) {
