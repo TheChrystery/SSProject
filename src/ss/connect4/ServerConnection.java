@@ -75,8 +75,6 @@ public class ServerConnection implements Runnable {
 							second = input.next();
 							secondRead = true;
 							sendMessage(getExtensions(second));
-						} else {
-							sendMessage("");
 						}
 					}
 					// legal commands for a player with status EMPTY
@@ -115,8 +113,12 @@ public class ServerConnection implements Runnable {
 							this.server.readyClients.remove(this);
 						}
 					}
-					if (server.readyClients.size() > 1 && this.connectionStatus.equals(STATUS.READY)) {
-						//start new game.
+					if (this.connectionStatus.equals(STATUS.READY)) {
+						for (ServerConnection opponent : server.readyClients) {
+							if (!opponent.equals(this) && connectionStatus.equals(STATUS.READY)) {
+								new ServerGame(this, opponent);
+							}
+						}
 					}
 				}
 			} catch (IOException e) {
@@ -172,22 +174,30 @@ public class ServerConnection implements Runnable {
 		for (int i = 0; i < filter.length(); i++) {
 			filterExts.add((int) filter.charAt(i));
 		}
-		for (ServerConnection conn : this.server.clients) {
-			int counter = 0;
-			Set<Integer> connExts = new HashSet<Integer>();
-			for (int j = 0; j < conn.extensions.length(); j++) {
-				filterExts.add((int) conn.extensions.charAt(j));
+
+		if (filter.equals("ALL")) {
+			for (int i = 0; i < server.clients.size(); i++) {
+				players = players + " " + server.clients.get(i).getName();
 			}
-			for (int i : filterExts) {
-				if (connExts.contains(i)) {
-					counter++;
+			return players;
+		} else {
+			for (ServerConnection conn : this.server.clients) {
+				int counter = 0;
+				Set<Integer> connExts = new HashSet<Integer>();
+				for (int j = 0; j < conn.extensions.length(); j++) {
+					filterExts.add((int) conn.extensions.charAt(j));
+				}
+				for (int i : filterExts) {
+					if (connExts.contains(i)) {
+						counter++;
+					}
+				}
+				if (counter == filter.length()) {
+					players = players + " " + conn.getName();
 				}
 			}
-			if (counter == filter.length()) {
-				players = players + " " + conn.getName();
-			}
+			return players;
 		}
-		return players;
 	}
 
 	/** returns name of the peer object */
@@ -199,8 +209,7 @@ public class ServerConnection implements Runnable {
 	 * Prints the String given as a parameter on system.out, Reads a string from
 	 * system.in and returns it
 	 * 
-	 * @param String
-	 *            tekst
+	 * @param String tekst
 	 * @return String antw
 	 */
 	static public String readString(String tekst) {
