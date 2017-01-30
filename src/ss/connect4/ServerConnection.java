@@ -20,7 +20,7 @@ public class ServerConnection implements Runnable {
 	public static final String EXIT = "exit";
 
 	protected Server server;
-	protected String name;
+	protected String name = "";
 	protected String extensions;
 	protected boolean ext0 = false;
 	protected boolean ext1 = false;
@@ -108,10 +108,15 @@ public class ServerConnection implements Runnable {
 					if (first.equals("GAME")) {
 						if (this.connectionStatus.equals(STATUS.NAMED) && first.equals("READY")) {
 							this.connectionStatus = STATUS.READY;
+							this.server.readyClients.add(this);
 						}
 						if (this.connectionStatus.equals(STATUS.READY) && first.equals("UNREADY")) {
 							this.connectionStatus = STATUS.NAMED;
+							this.server.readyClients.remove(this);
 						}
+					}
+					if (server.readyClients.size() > 1 && this.connectionStatus.equals(STATUS.READY)) {
+						//start new game.
 					}
 				}
 			} catch (IOException e) {

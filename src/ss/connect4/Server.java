@@ -11,19 +11,24 @@ import java.util.ArrayList;
 /**
  * Server.
  * 
- * @author Theo Ruys
+ * @author Sjoerd Kruijer & Alin Cadariu
  * @version 2005.02.21
  */
 public class Server {
+	//list of the serverConnections of all connected clients.	
 	public ArrayList<ServerConnection> clients; 
-	private static final String USAGE = "usage: " + Server.class.getName() + " <name> <port>";
+	//list of the serverConnections of all connected clients with STATUS READY.
+	public ArrayList<ServerConnection> readyClients;
+ 	private static final String USAGE = "usage: " + Server.class.getName() + " <name> <port>";
 	public ServerSocket sock;
 	private String name;
 	
 	public Server(String name, int port) {
 		// try to open a Socket to the server
 		this.name = name;
+		//initialize the clientArrays
 		clients = new ArrayList<ServerConnection>();
+		readyClients = new ArrayList<ServerConnection>();
 		try {
 			sock = new ServerSocket(port);
 		} catch (IOException e) {
