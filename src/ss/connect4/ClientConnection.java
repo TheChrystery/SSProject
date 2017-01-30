@@ -14,15 +14,12 @@ import java.util.Scanner;
  * @author Theo Ruys
  * @version 2005.02.21
  */
-public class Connection implements Runnable {
+public class ClientConnection implements Runnable {
 	public static final String EXIT = "exit";
 
-	protected String name;
 	protected Socket sock;
 	protected BufferedReader in;
 	protected BufferedWriter out;
-	public enum STATUS {EMPTY, READY, PLAYING};
-	public STATUS connectionStatus = STATUS.EMPTY;
 
 	/*
 	 * @ requires (nameArg != null) && (sockArg != null);
@@ -35,8 +32,8 @@ public class Connection implements Runnable {
 	 * @param sockArg
 	 *            Socket of the Peer-proces
 	 */
-	public Connection(Socket sockArg) throws IOException {
-		sock = sockArg;
+	public ClientConnection(Socket sock) throws IOException {
+		this.sock = sock;
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 	}
@@ -93,11 +90,6 @@ public class Connection implements Runnable {
 		}
 	}
 
-	/** returns name of the peer object */
-	public String getName() {
-		return name;
-	}
-
 	/** read a line from the default input */
 	static public String readString(String tekst) {
 		System.out.print(tekst);
@@ -107,7 +99,6 @@ public class Connection implements Runnable {
 			antw = in.readLine();
 		} catch (IOException e) {
 		}
-
 		return (antw == null) ? "" : antw;
 	}
 }

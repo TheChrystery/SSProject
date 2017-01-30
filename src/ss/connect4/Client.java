@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
  */
 public class Client {
     private static final String USAGE
-        = "usage: java week7.cmdline.Client <name> <address> <port>";
+        = "usage: java week7.cmdline.Client <address> <port>";
 
     /** Starts a Client application. */
     public static void main(String[] args) {
@@ -54,7 +54,7 @@ public class Client {
 
         // create Peer object and start the two-way communication
         try {
-            Connection client = new Connection(sock);
+            ClientConnection client = new ClientConnection(sock);
             Thread streamInputHandler = new Thread(client);
             streamInputHandler.start();
             client.handleTerminalInput();
