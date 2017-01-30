@@ -28,6 +28,7 @@ public class ServerConnection implements Runnable {
 	protected Socket sock;
 	protected BufferedReader in;
 	protected BufferedWriter out;
+	protected ServerGame game = null;
 
 	public enum STATUS {
 		EMPTY, NAMED, READY, PLAYING
@@ -65,6 +66,8 @@ public class ServerConnection implements Runnable {
 				if (input.hasNext()) {
 					String first = input.next();
 					String second = "";
+					int third = -1;
+					int fourth = -1;
 					boolean secondRead = false;
 					// legal commands for all stati
 					if (first.equals("DISCONNECT")) {
@@ -102,7 +105,8 @@ public class ServerConnection implements Runnable {
 						}
 						sendMessage("CONFIRM");
 					}
-					// legal commands beginning with GAME
+					// legal commands for players with !STATUS.PLAYING beginning
+					// with GAME
 					if (first.equals("GAME")) {
 						if (this.connectionStatus.equals(STATUS.NAMED) && first.equals("READY")) {
 							this.connectionStatus = STATUS.READY;
@@ -117,6 +121,25 @@ public class ServerConnection implements Runnable {
 						for (ServerConnection opponent : server.readyClients) {
 							if (!opponent.equals(this) && connectionStatus.equals(STATUS.READY)) {
 								new ServerGame(this, opponent);
+							}
+						}
+					}
+					//PLAYING clients making moves.
+					if (this.connectionStatus.equals(STATUS.PLAYING)) {
+						if (first.equals("GAME")) {
+							if (secondRead) {
+							} else if (input.hasNext()) {
+								second = input.next();
+								secondRead = true;
+							}
+							if (second.equals("MOVE")) {
+								if (input.hasNextInt()) {
+									third = input.nextInt();
+									if (input.hasNextInt()) {
+										fourth = input.nextInt();
+										this.game.makeMove(this, third, fourth);
+									}
+								}
 							}
 						}
 					}
@@ -200,16 +223,31 @@ public class ServerConnection implements Runnable {
 		}
 	}
 
-	/** returns name of the peer object */
+	/**
+	 * Returns the name of this ServerConnection
+	 * 
+	 * @return String name
+	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Returns the game this ServerConnection is currently playing, if there is
+	 * one.
+	 * 
+	 * @return ServerGame game
+	 */
+	public ServerGame getGame() {
+		return this.game;
 	}
 
 	/**
 	 * Prints the String given as a parameter on system.out, Reads a string from
 	 * system.in and returns it
 	 * 
-	 * @param String tekst
+	 * @param String
+	 *            tekst
 	 * @return String antw
 	 */
 	static public String readString(String tekst) {
@@ -220,7 +258,6 @@ public class ServerConnection implements Runnable {
 			antw = in.readLine();
 		} catch (IOException e) {
 		}
-
 		return (antw == null) ? "" : antw;
 	}
 }
