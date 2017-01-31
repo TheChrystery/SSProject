@@ -1,6 +1,6 @@
 package ss.connect4;
 
-public class ServerGame implements Runnable{
+public class ServerGame {
 	
 	public ServerConnection[] players;
 	private int current = 0;
@@ -20,13 +20,18 @@ public class ServerGame implements Runnable{
 		conn2.connectionStatus = ServerConnection.STATUS.PLAYING;
 		conn2.server.removeReadyClient(conn2);
 		conn2.game = this;
-		this.run();
-	}
-
-	@Override
-	public void run() {
-    	players[0].sendMessage("GAME START " + players[0].getName() + " " + players[1].getName());
+		players[0].sendMessage("GAME START " + players[0].getName() + " " + players[1].getName());
     	players[1].sendMessage("GAME START " + players[0].getName() + " " + players[1].getName());
+	}
+	
+	public ServerConnection otherPlayer(ServerConnection player) {
+		if (players[0].equals(player)) {
+			return players[1];
+		} else if (players[1].equals(player)){
+			return players[0];
+		} else {
+			return null;
+		}
 	}
 	
 	public boolean isTurn(ServerConnection player) {
@@ -69,15 +74,25 @@ public class ServerGame implements Runnable{
 			current++;
 			if (board.hasWinner()) {
 				if (board.isWinner(Mark.X)) {
+					players[0].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y);
+					players[1].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y);
 					players[0].sendMessage("GAME END " + players[0].getName());
 					players[1].sendMessage("GAME END " + players[0].getName());
+					
 				} else if (board.isWinner(Mark.O)) {
+					players[0].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y);
+					players[1].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y);
 					players[0].sendMessage("GAME END " + players[1].getName());
 					players[1].sendMessage("GAME END " + players[1].getName());
 				}
 			} else if (board.isFull()) {
+				players[0].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y);
+				players[1].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y);
 				players[0].sendMessage("GAME END DRAW");
 				players[1].sendMessage("GAME END DRAW");
+			} else {
+				players[0].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y + " " + otherPlayer(player).getName());
+				players[1].sendMessage("GAME MOVE " + player.getName() + " " + x + " " + y + " " + otherPlayer(player).getName());
 			}
 		}
 	}

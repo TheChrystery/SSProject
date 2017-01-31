@@ -96,6 +96,8 @@ public class Server {
 		}
 	}
 
+	
+	
 	/** Starts a Server-application. */
 	public static void main(String[] args) {
 		if (args.length != 2) {

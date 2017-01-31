@@ -47,6 +47,7 @@ public class ServerConnection implements Runnable {
 	 *            The Server this is a ServerConnection to
 	 */
 	public ServerConnection(Server param) throws IOException {
+		System.out.println("new ServerConnection established");
 		this.server = param;
 		this.sock = param.sock.accept();
 		this.server.addClient(this);
@@ -106,45 +107,37 @@ public class ServerConnection implements Runnable {
 						}
 						sendMessage("CONFIRM");
 					}
-					// legal commands for players with !STATUS.PLAYING beginning
-					// with GAME
+					// legal commands beginning with GAME
 					if (first.equals("GAME")) {
 						if (!secondRead) {
 							second = input.next();
-							if (this.connectionStatus.equals(STATUS.NAMED) && second.equals("READY")) {
-
-								this.connectionStatus = STATUS.READY;
-								this.server.addReadyClient(this);
-								// look for opponents. If this method doesn't
-								// start a game, it waits for an opponent to
-								// start one with this player.
-								for (ServerConnection opponent : server.getReadyClients()) {
-									if (!opponent.equals(this)) {
-										new ServerGame(this, opponent);
-										break;
-									}
+						}
+						if (this.connectionStatus.equals(STATUS.NAMED) && second.equals("READY")) {
+							this.connectionStatus = STATUS.READY;
+							this.server.addReadyClient(this);
+							// look for opponents. If this method doesn't
+							// start a game, it waits for an opponent to
+							// start one with this player.
+							for (ServerConnection opponent : server.getReadyClients()) {
+								if (!opponent.equals(this)) {
+									new ServerGame(this, opponent);
+									break;
 								}
 							}
-							if (this.connectionStatus.equals(STATUS.READY) && second.equals("UNREADY")) {
-								this.connectionStatus = STATUS.NAMED;
-								this.server.removeReadyClient(this);
-							}
 						}
-					}
-					// PLAYING client makes move.
-					if (this.connectionStatus.equals(STATUS.PLAYING)) {
-						if (first.equals("GAME")) {
-							if (secondRead) {
-							} else if (input.hasNext()) {
-								second = input.next();
-								secondRead = true;
-							}
-							if (second.equals("MOVE")) {
+						if (this.connectionStatus.equals(STATUS.READY) && second.equals("UNREADY")) {
+							this.connectionStatus = STATUS.NAMED;
+							this.server.removeReadyClient(this);
+						}
+						// PLAYING client makes move.
+						if (this.connectionStatus.equals(STATUS.PLAYING)) {
+							if (first.equals("GAME") && second.equals("MOVE")) {
 								if (input.hasNextInt()) {
 									third = input.nextInt();
 									if (input.hasNextInt()) {
 										fourth = input.nextInt();
 										this.game.makeMove(this, third, fourth);
+
 									}
 								}
 							}
@@ -253,7 +246,8 @@ public class ServerConnection implements Runnable {
 	 * Prints the String given as a parameter on system.out, Reads a string from
 	 * system.in and returns it
 	 * 
-	 * @param String tekst
+	 * @param String
+	 *            tekst
 	 * @return String antw
 	 */
 	static public String readString(String tekst) {
