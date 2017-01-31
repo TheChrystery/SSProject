@@ -15,7 +15,8 @@ public class ServerGame {
 	private int current = 0;
 	private Board board;
 	private TUIView view;
-
+	
+	//@ requires conn1 != null && conn2 != null;
 	/**
 	 * The constructor of a servergame. Takes two serverconnections as parameters, adjusts the players' stati
 	 * @param conn1
@@ -39,7 +40,7 @@ public class ServerGame {
 	}
 	
 	/**
-	 * A simple method to return the opponent of a given player, that player is in this game.
+	 * A simple method to return the opponent of a given player, if that player is in this ServerGame.
 	 * @param ServerConnection player
 	 * @return ServerConnection opponent
 	 */

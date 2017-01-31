@@ -10,10 +10,9 @@ import connect4.model.Player;
 import connect4.view.TUIView;
 
 /**
- * Class for maintaining the Tic Tac Toe game. Lab assignment Module 2
+ * Class for maintaining the connect4 game.
  * 
- * @author Theo Ruys en Arend Rensink
- * @version $Revision: 1.4 $
+ * @author Sjoerd Kruijer & Alin Cadariu
  */
 public class SimpleGame {
 

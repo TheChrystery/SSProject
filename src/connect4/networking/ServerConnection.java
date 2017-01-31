@@ -28,6 +28,7 @@ public class ServerConnection implements Runnable {
 	protected BufferedReader in;
 	protected BufferedWriter out;
 	protected ServerGame game = null;
+	private boolean continues = true;
 
 	public enum STATUS {
 		EMPTY, NAMED, READY, PLAYING
@@ -60,19 +61,25 @@ public class ServerConnection implements Runnable {
 	 */
 	public void run() {
 		Scanner input;
-		while (!sock.isClosed()) {
+		while (continues) {
 			try {
-				input = new Scanner(in.readLine());
+				String s = in.readLine();
+				System.out.println(s);
+				input = new Scanner(s);
 				if (input.hasNext()) {
 					String first = input.next();
 					String second = "";
-					int third = -1;
-					int fourth = -1;
+					int x = -1;
+					int y = -1;
 					boolean secondRead = false;
 					// legal commands for all stati
 					if (first.equals("STATUS")) {
 						sendMessage("" + this.connectionStatus);
 					} else if (first.equals("DISCONNECT")) {
+						// removes the client from the client lists and shut
+						// down their connection.
+						server.removeClient(this);
+						server.removeReadyClient(this);
 						this.shutDown();
 					} else if (first.equals("PLAYERS")) {
 						if (input.hasNext()) {
@@ -80,32 +87,35 @@ public class ServerConnection implements Runnable {
 							secondRead = true;
 							sendMessage(getExtensions(second));
 						}
-					} else
-					// legal commands for a player with status EMPTY
-					if (this.connectionStatus.equals(STATUS.EMPTY)) {
-						this.name = first;
-						this.connectionStatus = STATUS.NAMED;
+					} else if (this.connectionStatus.equals(STATUS.EMPTY) && first.equals("CONNECT")) {
 						extensions = "";
 						if (!secondRead && input.hasNext()) {
 							second = input.next();
 							secondRead = true;
 						}
-						if (!second.equals("")) {
-							if (second.contains("0")) {
-								extensions = extensions + "0";
-								ext0 = true;
+						this.name = second;
+						this.connectionStatus = STATUS.NAMED;
+						String third = "";
+						if (input.hasNext()) {
+							third = input.next();
+							if (!third.equals("")) {
+								if (third.contains("0")) {
+									extensions = extensions + "0";
+									ext0 = true;
+								}
+								if (third.contains("1")) {
+									extensions = extensions + "1";
+									ext1 = true;
+								}
+								if (third.contains("2")) {
+									extensions = extensions + "2";
+									ext2 = true;
+								}
 							}
-							if (second.contains("1")) {
-								extensions = extensions + "1";
-								ext1 = true;
-							}
-							if (second.contains("2")) {
-								extensions = extensions + "2";
-								ext2 = true;
-							}
+							sendMessage("CONFIRM");
 						}
-						sendMessage("CONFIRM");
 					}
+
 					// legal commands beginning with GAME
 					if (first.equals("GAME")) {
 						if (!secondRead) {
@@ -132,10 +142,10 @@ public class ServerConnection implements Runnable {
 						if (this.connectionStatus.equals(STATUS.PLAYING)) {
 							if (first.equals("GAME") && second.equals("MOVE")) {
 								if (input.hasNextInt()) {
-									third = input.nextInt();
+									x = input.nextInt();
 									if (input.hasNextInt()) {
-										fourth = input.nextInt();
-										this.game.makeMove(this, third, fourth);
+										y = input.nextInt();
+										this.game.makeMove(this, x, y);
 									}
 								}
 							}
@@ -180,6 +190,7 @@ public class ServerConnection implements Runnable {
 	 */
 	public void shutDown() {
 		try {
+			continues = false;
 			in.close();
 			out.close();
 			sock.close();

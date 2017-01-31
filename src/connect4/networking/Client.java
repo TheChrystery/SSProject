@@ -10,8 +10,7 @@ import java.net.UnknownHostException;
  * @author Sjoerd Kruijer & Alin Cadariu
  */
 public class Client {
-    private static final String USAGE
-        = "usage: java week7.cmdline.Client <address> <port>";
+    private static final String USAGE = "usage: java week7.cmdline.Client <address> <port>";
 
     /** Starts a Client application. */
     public static void main(String[] args) {
@@ -39,7 +38,7 @@ public class Client {
         } catch (NumberFormatException e) {
             System.out.println(USAGE);
             System.out.println("ERROR: port " + args[1]
-            		           + " is not an integer");
+            		           + " is not an integer"); 
             System.exit(0);
         }
 
@@ -53,11 +52,11 @@ public class Client {
 
         // create ClientConnection object and start the two-way communication
         try {
-            ClientConnection client = new ClientConnection(sock);
-            Thread streamInputHandler = new Thread(client);
+            ClientConnection clientConn = new ClientConnection(sock);
+            Thread streamInputHandler = new Thread(clientConn);
             streamInputHandler.start();
-            client.handleTerminalInput();
-            client.shutDown();
+            clientConn.handleTerminalInput();
+            clientConn.shutDown();
         } catch (IOException e) {
             e.printStackTrace();
         }
