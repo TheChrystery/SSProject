@@ -20,6 +20,10 @@ public class TUIView implements Observer {
 		board.addObserver(this);
 	}
 
+	/**
+	 * Constructs a string based on the board this is the view of and returns it. 
+	 * @return String board
+	 */
 	public String toString() {
 		String b = "";
 		for (int y = 0; y < board.DIM; y++) {
@@ -49,14 +53,11 @@ public class TUIView implements Observer {
 	}
 
 	@Override
+	/**
+	 * will print the view whenever the method playField of board is invoked.
+	 */
 	public void update(Observable arg0, Object arg1) {
 		System.out.println(this.toString());
 
-	}
-
-	public static void main(String[] args) {
-		Board b = new Board();
-		TUIView v = new TUIView(b);
-		b.playField(0, Mark.X);
 	}
 }

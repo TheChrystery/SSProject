@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 import connect4.model.Board;
+import connect4.model.ComputerPlayerAdv;
 import connect4.model.Mark;
 import connect4.view.TUIView;
 
@@ -18,12 +19,12 @@ import connect4.view.TUIView;
  * @author Sjoerd Kruijer & Alin Cadariu
  */
 public class ClientConnection implements Runnable {
-	public static final String EXIT = "exit";
 	protected Socket sock;
 	protected BufferedReader in;
 	protected BufferedWriter out;
 	private Board board;
 	private TUIView view;
+	private ComputerPlayerAdv comp;
 	private String name;
 	private String player1name;
 	private Mark player1mark = Mark.X;
@@ -47,7 +48,6 @@ public class ClientConnection implements Runnable {
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 		board = new Board();
 		view = new TUIView(board);
-		
 	}
 
 	/**
@@ -65,12 +65,29 @@ public class ClientConnection implements Runnable {
 				String third = "";
 				if (input.hasNext()) {
 					first = input.next();
-					if (input.hasNext()) {
+					if (first.equals("HELP") || first.equals("help")) {
+						System.out.println(
+								"After connecting to the server, the command 'CONNECT playername' declares your name to the server.\n"
+										+ "afterwards 'GAME READY' tries to start a new game with another waiting ready player. If there is none,\n "
+										+ "the game will start as soon as there is another ready player. When in game, use 'GAME MOVE x y' to play that move."
+										+ "the game will continue until the board has a winner, is full, or a client disconnects. When ready but not in game,"
+										+ "and you wish not to be assigned a random game, use 'GAME UNREADY; "
+										+ "to disconnect use 'DISCONNECT at any time. You can also request the list of all connected players using"
+										+ "'PLAYERS ALL', or narrow your search using 'PLAYERS extension(s)'");
+					} else if (input.hasNext()) {
 						second = input.next();
 						if (first.equals("GAME") && second.equals("START") && input.hasNext()) {
 							player1name = input.next();
 							if (input.hasNext()) {
 								player2name = input.next();
+								// the field 0 is already empty, but invoking
+								// this method will print the board once.
+								board.playField(0, Mark.E);
+								if (player1name.equals(name)) {
+									this.comp = new ComputerPlayerAdv("comp", Mark.X);
+								} else {
+									this.comp = new ComputerPlayerAdv("comp", Mark.O);
+								}
 							}
 						} else if (second.equals("MOVE") && input.hasNext()) {
 							third = input.next();
@@ -104,15 +121,22 @@ public class ClientConnection implements Runnable {
 		while (!sock.isClosed()) {
 			String send = readString("");
 			Scanner s = new Scanner(send);
-			if (send.equals(EXIT)) {
-				this.shutDown();
-			} else if (s.hasNext()) {
+			if (s.hasNext()) {
 				String first = s.next();
 				if (first.equals("CONNECT") && s.hasNext()) {
 					String second = s.next();
 					System.out.println("hello " + second);
 					this.name = second;
 				}
+			}
+			if (send.equals("SMARTMOVE")) {
+				int moveIndex = comp.determineMove(board);
+				int[] movexy = new int[]{board.coordinates(moveIndex)[0], board.coordinates(moveIndex)[1]};
+				send = "GAME MOVE " + movexy[0] + " " + movexy[1];
+				System.out.println("smartmove: " + movexy[0] + movexy[1]);
+			}
+			if (send.equals("DISCONNECT")) {
+				this.shutDown();
 			}
 			try {
 				out.write(send);
@@ -123,6 +147,7 @@ public class ClientConnection implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 		}
 	}
 

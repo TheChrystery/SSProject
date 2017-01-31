@@ -36,8 +36,10 @@ public class ServerConnection implements Runnable {
 
 	public STATUS connectionStatus = STATUS.EMPTY;
 
+	// @ requires !param.equals(null);
+	// @ ensures server.getClients().contains(this);
 	/*
-	 * @ requires (nameArg != null) && (sockArg != null);
+	 * 
 	 */
 	/**
 	 * Constructor. creates a ServerConnection object based in the given
@@ -47,12 +49,12 @@ public class ServerConnection implements Runnable {
 	 *            The Server this is a ServerConnection to
 	 */
 	public ServerConnection(Server param) throws IOException {
-		System.out.println("new ServerConnection established");
 		this.server = param;
 		this.sock = param.sock.accept();
-		this.server.addClient(this);
+		this.server.addClient(this);		
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+		System.out.println("new ServerConnection established, there are now " + server.getClients().size() + " connections." );
 	}
 
 	/**
@@ -63,89 +65,92 @@ public class ServerConnection implements Runnable {
 		Scanner input;
 		while (continues) {
 			try {
-				String s = in.readLine();
-				System.out.println(s);
-				input = new Scanner(s);
-				if (input.hasNext()) {
-					String first = input.next();
-					String second = "";
-					int x = -1;
-					int y = -1;
-					boolean secondRead = false;
-					// legal commands for all stati
-					if (first.equals("STATUS")) {
-						sendMessage("" + this.connectionStatus);
-					} else if (first.equals("DISCONNECT")) {
-						// removes the client from the client lists and shut
-						// down their connection.
-						server.removeClient(this);
-						server.removeReadyClient(this);
-						this.shutDown();
-					} else if (first.equals("PLAYERS")) {
-						if (input.hasNext()) {
-							second = input.next();
-							secondRead = true;
-							sendMessage(getExtensions(second));
-						}
-					} else if (this.connectionStatus.equals(STATUS.EMPTY) && first.equals("CONNECT")) {
-						extensions = "";
-						if (!secondRead && input.hasNext()) {
-							second = input.next();
-							secondRead = true;
-						}
-						this.name = second;
-						this.connectionStatus = STATUS.NAMED;
-						String third = "";
-						if (input.hasNext()) {
-							third = input.next();
-							if (!third.equals("")) {
-								if (third.contains("0")) {
-									extensions = extensions + "0";
-									ext0 = true;
-								}
-								if (third.contains("1")) {
-									extensions = extensions + "1";
-									ext1 = true;
-								}
-								if (third.contains("2")) {
-									extensions = extensions + "2";
-									ext2 = true;
+				if (in.ready()) {
+					String s = in.readLine();
+					System.out.println(s);
+					input = new Scanner(s);
+					if (input.hasNext()) {
+						String first = input.next();
+						String second = "";
+						int x = -1;
+						int y = -1;
+						boolean secondRead = false;
+						// legal commands for all stati
+						if (first.equals("STATUS")) {
+							sendMessage("" + this.connectionStatus);
+						} else if (first.equals("DISCONNECT")) {
+							// removes the client from the client lists and shut
+							// down their connection.
+							server.removeClient(this);
+							server.removeReadyClient(this);
+							this.shutDown();
+						} else if (first.equals("PLAYERS")) {
+							if (input.hasNext()) {
+								second = input.next();
+								secondRead = true;
+								sendMessage(getExtensions(second));
+							}
+						} else if (this.connectionStatus.equals(STATUS.EMPTY) && first.equals("CONNECT")) {
+							extensions = "";
+							if (!secondRead && input.hasNext()) {
+								second = input.next();
+								secondRead = true;
+							}
+							this.name = second;
+							this.connectionStatus = STATUS.NAMED;
+							String third = "";
+							if (input.hasNext()) {
+								third = input.next();
+								if (!third.equals("")) {
+									if (third.contains("0")) {
+										extensions = extensions + "0";
+										ext0 = true;
+									}
+									if (third.contains("1")) {
+										extensions = extensions + "1";
+										ext1 = true;
+									}
+									if (third.contains("2")) {
+										extensions = extensions + "2";
+										ext2 = true;
+									}
 								}
 							}
 							sendMessage("CONFIRM");
+							System.out.println("New named client: " + this.getName() + " exts: " + this.extensions);
 						}
-					}
-
-					// legal commands beginning with GAME
-					if (first.equals("GAME")) {
-						if (!secondRead) {
-							second = input.next();
-						}
-						if (this.connectionStatus.equals(STATUS.NAMED) && second.equals("READY")) {
-							this.connectionStatus = STATUS.READY;
-							this.server.addReadyClient(this);
-							// look for opponents. If this method doesn't
-							// start a game, it waits for an opponent to
-							// start one with this player.
-							for (ServerConnection opponent : server.getReadyClients()) {
-								if (!opponent.equals(this)) {
-									new ServerGame(this, opponent);
-									break;
+	
+						// legal commands beginning with GAME
+						if (first.equals("GAME")) {
+							if (!secondRead) {
+								second = input.next();
+							}
+							if (this.connectionStatus.equals(STATUS.NAMED) && second.equals("READY")) {
+								this.connectionStatus = STATUS.READY;
+								this.server.addReadyClient(this);
+								// look for opponents. If this method doesn't
+								// start a game, it waits for an opponent to
+								// start one with this player.
+								for (ServerConnection opponent : server.getReadyClients()) {
+									if (!opponent.equals(this)) {
+										new ServerGame(this, opponent);
+										break;
+									}
 								}
 							}
-						}
-						if (this.connectionStatus.equals(STATUS.READY) && second.equals("UNREADY")) {
-							this.connectionStatus = STATUS.NAMED;
-							this.server.removeReadyClient(this);
-						}
-						// PLAYING client makes move.
-						if (this.connectionStatus.equals(STATUS.PLAYING)) {
-							if (first.equals("GAME") && second.equals("MOVE")) {
-								if (input.hasNextInt()) {
-									x = input.nextInt();
+							if (this.connectionStatus.equals(STATUS.READY) && second.equals("UNREADY")) {
+								this.connectionStatus = STATUS.NAMED;
+								this.server.removeReadyClient(this);
+							}
+							// PLAYING client makes move.
+							if (this.connectionStatus.equals(STATUS.PLAYING)) {
+								if (first.equals("GAME") && second.equals("MOVE")) {
 									if (input.hasNextInt()) {
-										y = input.nextInt();
-										this.game.makeMove(this, x, y);
+										x = input.nextInt();
+										if (input.hasNextInt()) {
+											y = input.nextInt();
+											this.game.makeMove(this, x, y);
+										}
 									}
 								}
 							}
