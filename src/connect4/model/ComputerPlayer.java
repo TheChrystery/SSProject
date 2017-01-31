@@ -1,7 +1,5 @@
-package ss.connect4;
+package connect4.model;
 
-import ss.connect4.Board;
-import ss.connect4.Mark;
 import java.util.*;
 
 public class ComputerPlayer extends Player {

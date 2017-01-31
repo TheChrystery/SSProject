@@ -1,8 +1,11 @@
-package ss.connect4;
+package connect4.view;
 
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
+
+import connect4.model.Board;
+import connect4.model.Mark;
 
 public class TUIView implements Observer {
 

@@ -1,5 +1,14 @@
-package ss.connect4;
+package connect4.networking;
 
+import connect4.model.Board;
+import connect4.model.Mark;
+import connect4.view.TUIView;
+
+/**
+ * 
+ * @author Sjoerd Kruijer & Alin Cadariu
+ *
+ */
 public class ServerGame {
 	
 	public ServerConnection[] players;
@@ -7,6 +16,11 @@ public class ServerGame {
 	private Board board;
 	private TUIView view;
 
+	/**
+	 * The constructor of a servergame. Takes two serverconnections as parameters, adjusts the players' stati
+	 * @param conn1
+	 * @param conn2
+	 */
 	public ServerGame(ServerConnection conn1, ServerConnection conn2) {
         board = new Board();
         view = new TUIView(board);
@@ -24,6 +38,11 @@ public class ServerGame {
     	players[1].sendMessage("GAME START " + players[0].getName() + " " + players[1].getName());
 	}
 	
+	/**
+	 * A simple method to return the opponent of a given player, that player is in this game.
+	 * @param ServerConnection player
+	 * @return ServerConnection opponent
+	 */
 	public ServerConnection otherPlayer(ServerConnection player) {
 		if (players[0].equals(player)) {
 			return players[1];
@@ -34,6 +53,11 @@ public class ServerGame {
 		}
 	}
 	
+	/**
+	 * Returns whether it is currently the given player's turn.
+	 * @param player
+	 * @return true/false
+	 */
 	public boolean isTurn(ServerConnection player) {
 		if (players[current % 2].equals(player)) {
 			return true;
@@ -41,6 +65,11 @@ public class ServerGame {
 		return false;
 	}
 	
+	/**
+	 * return the Mark of player given as a parameter. The starting player always has mark X.
+	 * @param player
+	 * @return Mark
+	 */
 	public Mark getMark(ServerConnection player) {
 		if (player.equals(players[0])) {
 			return Mark.X;
@@ -51,6 +80,11 @@ public class ServerGame {
 		}
 	}
 	
+	/**
+	 * Returns the player corresponding to the given Mark in this game.
+	 * @param Mark m
+	 * @return ServerConnection
+	 */
 	public ServerConnection getPlayer(Mark m) {
 		if (m.equals(Mark.X)) {
 			return players[0];
@@ -68,6 +102,14 @@ public class ServerGame {
 		//future implementation.
 	}
 	
+	/**
+	 * This method allows players to make moves. It takes a player, and x and y coordinates as parameters. If it is this players turn, 
+	 * and (x,y) is a valid move, than the move is played and the players are notified. After each move it also checks whether the game
+	 * has ended yet, and notifies the players of the result if so. 
+	 * @param player
+	 * @param x
+	 * @param y
+	 */
 	public synchronized void makeMove(ServerConnection player, int x, int y) {
 		if (isTurn(player) && board.isPlayableField(board.moveIndex(x, y))) {
 			board.setField(board.moveIndex(x,y), getMark(player));

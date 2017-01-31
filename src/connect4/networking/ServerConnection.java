@@ -1,4 +1,4 @@
-package ss.connect4;
+package connect4.networking;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,8 +13,7 @@ import java.util.Set;
 /**
  * Peer for a simple client-server application
  * 
- * @author Theo Ruys
- * @version 2005.02.21
+ * @author Sjoerd Kruijer & Alin Cadariu
  */
 public class ServerConnection implements Runnable {
 	public static final String EXIT = "exit";
@@ -137,7 +136,6 @@ public class ServerConnection implements Runnable {
 									if (input.hasNextInt()) {
 										fourth = input.nextInt();
 										this.game.makeMove(this, third, fourth);
-
 									}
 								}
 							}

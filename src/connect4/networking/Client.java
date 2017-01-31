@@ -1,4 +1,4 @@
-package ss.connect4;
+package connect4.networking;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -7,8 +7,7 @@ import java.net.UnknownHostException;
 
 /**
  * Client class for a simple client-server application
- * @author  Theo Ruys
- * @version 2005.02.21
+ * @author Sjoerd Kruijer & Alin Cadariu
  */
 public class Client {
     private static final String USAGE
@@ -20,12 +19,12 @@ public class Client {
             System.out.println(USAGE);
             System.exit(0);
         }
-
+        
         InetAddress addr = null;
         int port = 0;
         Socket sock = null;
 
-        // check args[1] - the IP-adress
+        // check args[0] - the IP-adress
         try {
             addr = InetAddress.getByName(args[0]);
         } catch (UnknownHostException e) {
@@ -34,7 +33,7 @@ public class Client {
             System.exit(0);
         }
 
-        // parse args[2] - the port
+        // parse args[1] - the port
         try {
             port = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
@@ -52,7 +51,7 @@ public class Client {
                     + " and port " + port);
         }
 
-        // create Peer object and start the two-way communication
+        // create ClientConnection object and start the two-way communication
         try {
             ClientConnection client = new ClientConnection(sock);
             Thread streamInputHandler = new Thread(client);

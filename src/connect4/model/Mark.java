@@ -1,4 +1,4 @@
-package ss.connect4;
+package connect4.model;
 
 public enum Mark {
 

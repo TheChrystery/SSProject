@@ -1,6 +1,13 @@
-package ss.connect4;
+package connect4.controller;
 
 import java.util.Scanner;
+
+import connect4.model.Board;
+import connect4.model.ComputerPlayerAdv;
+import connect4.model.HumanPlayer;
+import connect4.model.Mark;
+import connect4.model.Player;
+import connect4.view.TUIView;
 
 /**
  * Class for maintaining the Tic Tac Toe game. Lab assignment Module 2

@@ -1,9 +1,6 @@
-package ss.connect4;
+package connect4.model;
 
 import java.util.ArrayList;
-
-import ss.connect4.Board;
-import ss.connect4.Mark;
 
 
 

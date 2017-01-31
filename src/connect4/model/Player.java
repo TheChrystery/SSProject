@@ -1,6 +1,4 @@
-package ss.connect4;
-
-import ss.connect4.Mark;
+package connect4.model;
 
 /**
  * Abstract class for keeping a player in the Tic Tac Toe game. Module 2 lab

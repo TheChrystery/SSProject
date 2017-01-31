@@ -1,5 +1,5 @@
 
-package ss.connect4;
+package connect4.networking;
 
 import java.io.IOException;
 import java.net.InetAddress;

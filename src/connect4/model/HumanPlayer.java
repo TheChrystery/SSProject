@@ -1,4 +1,4 @@
-package ss.connect4;
+package connect4.model;
 
 import java.util.Scanner;
 

@@ -1,4 +1,4 @@
-package ss.connect4;
+package connect4.networking;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,8 +11,7 @@ import java.util.Scanner;
 /**
  * Peer for a simple client-server application
  * 
- * @author Theo Ruys
- * @version 2005.02.21
+ * @author Sjoerd Kruijer & Alin Cadariu
  */
 public class ClientConnection implements Runnable {
 	public static final String EXIT = "exit";

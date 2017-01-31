@@ -2,11 +2,12 @@ package ss.connect4.tests;
 
 import org.junit.Before;
 import org.junit.Test;
-import ss.connect4.Board;
-import ss.connect4.ComputerPlayer;
-import ss.connect4.HumanPlayer;
-import ss.connect4.Mark;
-import ss.connect4.Player;
+
+import connect4.model.Board;
+import connect4.model.ComputerPlayer;
+import connect4.model.HumanPlayer;
+import connect4.model.Mark;
+import connect4.model.Player;
 
 import static org.junit.Assert.*;
 
