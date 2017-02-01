@@ -89,6 +89,8 @@ public class ClientConnection implements Runnable {
 									this.naiveComp = new ComputerPlayer("naiveComp", Mark.O);
 								}
 							}
+						} else if (first.equals("GAME") && second.equals("END")) {
+							board.reset();
 						} else if (second.equals("MOVE") && input.hasNext()) {
 							third = input.next();
 							if (input.hasNextInt()) {
@@ -184,6 +186,8 @@ public class ClientConnection implements Runnable {
 		}
 	}
 
+	//@ requires @param != null;
+    //@ ensures \result != null;
 	/** read a line from the default input */
 	static public String readString(String tekst) {
 		System.out.print(tekst);

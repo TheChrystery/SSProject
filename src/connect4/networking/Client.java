@@ -14,7 +14,9 @@ import java.net.UnknownHostException;
 public class Client {
     private static final String USAGE = "usage: java week7.cmdline.Client <address> <port>";
     
-	/** read a line from the default input */
+    /** read a line from the default input */
+    //@ requires @param != null;
+    //@ ensures \result != null;
 	static public String readString(String tekst) {
 		System.out.print(tekst);
 		String antw = null;

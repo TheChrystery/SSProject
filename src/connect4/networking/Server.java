@@ -42,6 +42,8 @@ public class Server {
 		}
 	}
 	
+	//@ requires @param != null;
+    //@ ensures \result != null;
 	/** read a line from the default input */
 	static public String readString(String tekst) {
 		System.out.print(tekst);
