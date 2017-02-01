@@ -67,21 +67,17 @@ public class ClientConnection implements Runnable {
 				String third = "";
 				if (input.hasNext()) {
 					first = input.next();
-					if (first.equals("HELP") || first.equals("help")) {
-						System.out.println(
-								"After connecting to the server, the command 'CONNECT playername' declares your name to the server.\n"
-										+ "afterwards 'GAME READY' tries to start a new game with another waiting ready player. If there is none,\n "
-										+ "the game will start as soon as there is another ready player. When in game, use 'GAME MOVE x y' to play that move."
-										+ "the game will continue until the board has a winner, is full, or a client disconnects. When ready but not in game,"
-										+ "and you wish not to be assigned a random game, use 'GAME UNREADY; "
-										+ "to disconnect use 'DISCONNECT at any time. You can also request the list of all connected players using"
-										+ "'PLAYERS ALL', or narrow your search using 'PLAYERS extension(s)'");
+					if (first.equals("CONFIRM")) {
+						System.out.println("Type 'GAME READY' to be assigned a random game ASAP.");
 					} else if (input.hasNext()) {
 						second = input.next();
 						if (first.equals("GAME") && second.equals("START") && input.hasNext()) {
 							player1name = input.next();
 							if (input.hasNext()) {
 								player2name = input.next();
+								System.out.println("Type 'GAME MOVE x y' to place your mark in the lowest available Z-plane when it is your turn.\n"
+										+ "When a move is made, the Server sends 'GAME MOVE player x y otherplayer', indicating 'player' just played (x,y),\n"
+										+ "and it is now 'otherplayer's' turn. Type help at any time for more details");
 								// the field 0 is already empty, but invoking
 								// this method will print the board once.
 								board.playField(0, Mark.E);
@@ -132,20 +128,29 @@ public class ClientConnection implements Runnable {
 					if (second.equals("me")) {
 						send = "CONNECT TheMemeParty";
 					} else {
-					System.out.println("hello " + second);
-					this.name = second;
+						System.out.println("hello " + second);
+						this.name = second;
 					}
+				} else if (first.equals("HELP") || first.equals("help")) {
+					System.out.println(
+							"\nAfter connecting to the server, the command 'CONNECT playername' declares your name to the server.\n"
+									+ "afterwards 'GAME READY' tries to start a new game with another waiting ready player. If there is none,\n "
+									+ "the game will start as soon as there is another ready player. When in game, use 'GAME MOVE x y' to play that move.\n"
+									+ "the game will continue until the board has a winner, is full, or a client disconnects. When ready but not in game,\n"
+									+ "and you wish not to be assigned a random game, use 'GAME UNREADY'\n"
+									+ "to disconnect use 'DISCONNECT at any time. You can also request the list of all connected players using\n"
+									+ "'PLAYERS ALL', or narrow your search using 'PLAYERS extension(s)'\n");
 				}
 			}
 			if (send.equals("SMARTMOVE")) {
 				int moveIndex = smartComp.determineMove(board);
-				int[] movexy = new int[]{board.coordinates(moveIndex)[0], board.coordinates(moveIndex)[1]};
+				int[] movexy = new int[] { board.coordinates(moveIndex)[0], board.coordinates(moveIndex)[1] };
 				send = "GAME MOVE " + movexy[0] + " " + movexy[1];
 				System.out.println("smartmove: " + movexy[0] + movexy[1]);
 			}
 			if (send.equals("RANDOMMOVE")) {
 				int moveIndex = naiveComp.determineMove(board);
-				int[] movexy = new int[]{board.coordinates(moveIndex)[0], board.coordinates(moveIndex)[1]};
+				int[] movexy = new int[] { board.coordinates(moveIndex)[0], board.coordinates(moveIndex)[1] };
 				send = "GAME MOVE " + movexy[0] + " " + movexy[1];
 				System.out.println("random move: " + movexy[0] + movexy[1]);
 			}
@@ -161,7 +166,7 @@ public class ClientConnection implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
 	}
 

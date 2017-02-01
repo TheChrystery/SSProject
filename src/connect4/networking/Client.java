@@ -28,11 +28,6 @@ public class Client {
 
     /** Starts a Client application. */
     public static void main(String[] args) {
-        /*if (args.length != 2) {
-            System.out.println(USAGE);
-            System.exit(0);
-        }*/
-        
         InetAddress addr = null;
         int port = 0;
         Socket sock = null;
@@ -69,6 +64,7 @@ public class Client {
         // create ClientConnection object and start the two-way communication
         try {
             ClientConnection clientConn = new ClientConnection(sock);
+            System.out.println("Type 'CONNECT' + your_name' to introduce yourself to the server.");
             Thread streamInputHandler = new Thread(clientConn);
             streamInputHandler.start();
             clientConn.handleTerminalInput();

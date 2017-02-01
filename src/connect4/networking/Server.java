@@ -112,10 +112,6 @@ public class Server {
 	
 	/** Starts a Server-application. */
 	public static void main(String[] args) {
-		if (args.length != 2) {
-			System.out.println(USAGE);
-			System.exit(0);
-		}
 		String portString = readString("Server port number?");
 		int port = 0;
 		ServerSocket sock = null;
