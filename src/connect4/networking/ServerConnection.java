@@ -51,10 +51,11 @@ public class ServerConnection implements Runnable {
 	public ServerConnection(Server param) throws IOException {
 		this.server = param;
 		this.sock = param.sock.accept();
-		this.server.addClient(this);		
+		this.server.addClient(this);
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-		System.out.println("new ServerConnection established, there are now " + server.getClients().size() + " connections." );
+		System.out.println(
+				"new ServerConnection established, there are now " + server.getClients().size() + " connections.");
 	}
 
 	/**
@@ -66,6 +67,7 @@ public class ServerConnection implements Runnable {
 		while (continues) {
 			try {
 				if (in.ready()) {
+					boolean messageSent = false;
 					String s = in.readLine();
 					System.out.println(s);
 					input = new Scanner(s);
@@ -78,6 +80,7 @@ public class ServerConnection implements Runnable {
 						// legal commands for all stati
 						if (first.equals("STATUS")) {
 							sendMessage("" + this.connectionStatus);
+							messageSent = true;
 						} else if (first.equals("DISCONNECT")) {
 							// removes the client from the client lists and shut
 							// down their connection.
@@ -89,6 +92,7 @@ public class ServerConnection implements Runnable {
 								second = input.next();
 								secondRead = true;
 								sendMessage(getExtensions(second));
+								messageSent = true;
 							}
 						} else if (this.connectionStatus.equals(STATUS.EMPTY) && first.equals("CONNECT")) {
 							extensions = "";
@@ -117,9 +121,10 @@ public class ServerConnection implements Runnable {
 								}
 							}
 							sendMessage("CONFIRM");
+							messageSent = true;
 							System.out.println("New named client: " + this.getName() + " exts: " + this.extensions);
 						}
-	
+
 						// legal commands beginning with GAME
 						if (first.equals("GAME")) {
 							if (!secondRead) {
@@ -155,8 +160,17 @@ public class ServerConnection implements Runnable {
 								}
 							}
 						}
+
+						// if we get this far the method was unable to
+						// interpret/process the command.
+
+					}
+
+					if (messageSent = false) {
+						sendMessage("ERROR 010");
 					}
 				}
+
 			} catch (IOException e) {
 				this.shutDown();
 				e.printStackTrace();
@@ -190,6 +204,8 @@ public class ServerConnection implements Runnable {
 		}
 	}
 
+	//@ requires !in.equals(null) && !out.equals(null);
+	//@ ensures continues = false;
 	/**
 	 * Closes the connection, the sockets will be terminated
 	 */
@@ -205,6 +221,7 @@ public class ServerConnection implements Runnable {
 		}
 	}
 
+	//@ ensures
 	public String getExtensions(String filter) {
 		String players = "";
 		Set<Integer> filterExts = new HashSet<Integer>();

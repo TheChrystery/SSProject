@@ -1,7 +1,9 @@
 
 package connect4.networking;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,12 +25,10 @@ public class Server {
 	private ArrayList<ServerConnection> readyClients;
 	private static final String USAGE = "usage: " + Server.class.getName() + " <name> <port>";
 	public ServerSocket sock;
-	private String name;
 	private Lock clientsLock;
 	private Lock readyClientsLock;
 
-	public Server(String name, int port) {
-		this.name = name;
+	public Server(int port) {
 		// initialize the clientArrays and locks
 		clients = new ArrayList<ServerConnection>();
 		clientsLock = new ReentrantLock();
@@ -40,6 +40,18 @@ public class Server {
 		} catch (IOException e) {
 			System.out.println("ERROR: could not create a socket on " + " port " + port);
 		}
+	}
+	
+	/** read a line from the default input */
+	static public String readString(String tekst) {
+		System.out.print(tekst);
+		String antw = null;
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			antw = in.readLine();
+		} catch (IOException e) {
+		}
+		return (antw == null) ? "" : antw;
 	}
 
 	public ArrayList<ServerConnection> getClients() {
@@ -104,18 +116,18 @@ public class Server {
 			System.out.println(USAGE);
 			System.exit(0);
 		}
-		String name = args[0];
+		String portString = readString("Server port number?");
 		int port = 0;
 		ServerSocket sock = null;
-		// parse args[1] - the port
+		// parse portString - the port
 		try {
-			port = Integer.parseInt(args[1]);
+			port = Integer.parseInt(portString);
 		} catch (NumberFormatException e) {
 			System.out.println(USAGE);
-			System.out.println("ERROR: port " + args[1] + " is not an integer");
+			System.out.println("ERROR: port " + portString + " is not an integer");
 			System.exit(0);
 		}
-		Server server = new Server(name, port);
+		Server server = new Server(port);
 		// create connections and start communication
 		while (true) {
 			try {

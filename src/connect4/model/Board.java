@@ -68,6 +68,7 @@ public class Board extends Observable {
 			xyz[2] = index / 16;
 			return xyz;
 		} else {
+			System.out.println("tried to get coordinates on a non-field");
 			return null;
 		}
 	}

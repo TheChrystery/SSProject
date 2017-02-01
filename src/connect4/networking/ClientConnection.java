@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 import connect4.model.Board;
+import connect4.model.ComputerPlayer;
 import connect4.model.ComputerPlayerAdv;
 import connect4.model.Mark;
 import connect4.view.TUIView;
@@ -24,7 +25,8 @@ public class ClientConnection implements Runnable {
 	protected BufferedWriter out;
 	private Board board;
 	private TUIView view;
-	private ComputerPlayerAdv comp;
+	private ComputerPlayerAdv smartComp;
+	private ComputerPlayer naiveComp;
 	private String name;
 	private String player1name;
 	private Mark player1mark = Mark.X;
@@ -84,9 +86,11 @@ public class ClientConnection implements Runnable {
 								// this method will print the board once.
 								board.playField(0, Mark.E);
 								if (player1name.equals(name)) {
-									this.comp = new ComputerPlayerAdv("comp", Mark.X);
+									this.smartComp = new ComputerPlayerAdv("smartComp", Mark.X);
+									this.naiveComp = new ComputerPlayer("naiveComp", Mark.X);
 								} else {
-									this.comp = new ComputerPlayerAdv("comp", Mark.O);
+									this.smartComp = new ComputerPlayerAdv("smartComp", Mark.O);
+									this.naiveComp = new ComputerPlayer("naiveComp", Mark.O);
 								}
 							}
 						} else if (second.equals("MOVE") && input.hasNext()) {
@@ -125,15 +129,25 @@ public class ClientConnection implements Runnable {
 				String first = s.next();
 				if (first.equals("CONNECT") && s.hasNext()) {
 					String second = s.next();
+					if (second.equals("me")) {
+						send = "CONNECT TheMemeParty";
+					} else {
 					System.out.println("hello " + second);
 					this.name = second;
+					}
 				}
 			}
 			if (send.equals("SMARTMOVE")) {
-				int moveIndex = comp.determineMove(board);
+				int moveIndex = smartComp.determineMove(board);
 				int[] movexy = new int[]{board.coordinates(moveIndex)[0], board.coordinates(moveIndex)[1]};
 				send = "GAME MOVE " + movexy[0] + " " + movexy[1];
 				System.out.println("smartmove: " + movexy[0] + movexy[1]);
+			}
+			if (send.equals("RANDOMMOVE")) {
+				int moveIndex = naiveComp.determineMove(board);
+				int[] movexy = new int[]{board.coordinates(moveIndex)[0], board.coordinates(moveIndex)[1]};
+				send = "GAME MOVE " + movexy[0] + " " + movexy[1];
+				System.out.println("random move: " + movexy[0] + movexy[1]);
 			}
 			if (send.equals("DISCONNECT")) {
 				this.shutDown();
