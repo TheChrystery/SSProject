@@ -1,5 +1,8 @@
 package connect4.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 import connect4.model.Board;
@@ -16,7 +19,7 @@ import connect4.view.TUIView;
  */
 public class SimpleGame {
 
-    // -- Instance variables -----------------------------------------
+    // --- Instance variables -----------------------------------------
 
     public static final int NUMBER_PLAYERS = 2;
 
@@ -113,6 +116,20 @@ public class SimpleGame {
         } while (answer == null || (!answer.equals(yes) && !answer.equals(no)));
         return answer.equals(yes);
     }
+    
+    /** read a line from the default input */
+    //@ requires @param != null;
+    //@ ensures \result != null;
+	static public String readString(String tekst) {
+		System.out.print(tekst);
+		String antw = null;
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			antw = in.readLine();
+		} catch (IOException e) {
+		}
+		return (antw == null) ? "" : antw;
+	}
 
     /**
      * Resets the game. <br>
@@ -145,7 +162,7 @@ public class SimpleGame {
     private void printResult() {
         if (board.hasWinner()) {
             Player winner = board.isWinner(players[0].getMark()) ? players[0] : players[1];
-            System.out.println("Speler " + winner.getName() + " ("
+            System.out.println("Player " + winner.getName() + " ("
                     + winner.getMark().toString() + ") has won!");
         } else if (board.isFull()) {
             System.out.println("Draw. There is no winner!");
@@ -153,8 +170,9 @@ public class SimpleGame {
     }
     
     public static void main(String[] args) {
-    	SimpleGame test = new SimpleGame(new HumanPlayer("Klaas", Mark.X), new ComputerPlayerAdv("Piet", Mark.O));
+    	String player1name = readString("Player 1 name?");
+    	String player2name = readString("Player 2 name?");
+    	SimpleGame test = new SimpleGame(new HumanPlayer(player1name, Mark.X), new HumanPlayer(player2name, Mark.O));
     	test.start();
-    	
     }
 }
